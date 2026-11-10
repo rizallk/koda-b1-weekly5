@@ -1,0 +1,74 @@
+@baseUrl = http://localhost:5219
+
+### ================== USERS ==================
+### 1. Get all users✅
+GET {{baseUrl}}/api/users
+Accept: application/json
+Content-Type: application/json
+
+### 2. Get user detail✅
+GET {{baseUrl}}/api/users/4
+Accept: application/json
+Content-Type: application/json
+
+### 3. Create user and wallet✅
+POST {{baseUrl}}/api/users
+Accept: application/json
+Content-Type: application/json
+
+{
+  "name": "John Doe",
+  "email": "johndoe@gmail.com",
+  "phone": "082347711639"
+}
+
+### 4. Update user✅
+PUT {{baseUrl}}/api/users/4
+Accept: application/json
+Content-Type: application/json
+
+{
+  "name": "Mawar Melati",
+  "email": "mawar12@gmail.com",
+  "phone": "082347716677"
+}
+
+### 5. Transaction history✅
+GET {{baseUrl}}/api/users/1/transactions
+Accept: application/json
+Content-Type: application/json
+
+### ================== WALLETS ==================
+### 6. Get wallet information✅
+GET {{baseUrl}}/api/wallets/4
+Accept: application/json
+Content-Type: application/json
+
+### 7. Top up wallet✅
+POST {{baseUrl}}/api/wallets/4/topups
+Accept: application/json
+Content-Type: application/json
+
+{
+  "userId": 4,
+  "walletNumber": "W004",
+  "balance": 5000
+}
+
+### ================== TRANSFER ==================
+### 8. Transfer balance✅
+POST {{baseUrl}}/api/transfers
+Accept: application/json
+Content-Type: application/json
+
+{
+  "senderWalletId": 4,
+  "receiverWalletId": 1,
+  "amount": 10000
+}
+
+
+
+
+
+

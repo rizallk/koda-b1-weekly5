@@ -1,0 +1,46 @@
+@model DashboardViewModel
+
+@{
+  ViewData["Title"] = "Dashboard";
+}
+<div>
+  <div class="d-flex justify-content-between align-items-md-center mb-3 flex-column flex-md-row">
+    <h4 class="mb-md-0">Dashboard</h4>
+    <h5 class="mb-0">Halo, @Model.UserWallet?.Name!</h5>
+  </div>
+  
+  <div class="row">
+    <div class="col-md-6">
+      <p>Informasi akun Anda</p>
+      <ul class="list-group">
+        <li class="list-group-item">
+          <span class="text-secondary">Nama</span><br>
+          <span class="fw-bold">@Model.UserWallet?.Name</span>
+        </li>
+        <li class="list-group-item">
+          <span class="text-secondary">Wallet Number</span><br>
+          <span class="fw-bold">@Model.UserWallet?.WalletNumber</span>
+        </li>
+        <li class="list-group-item">
+          <span class="text-secondary">Saldo</span><br>
+          <span class="fw-bold">@($"{Model.UserWallet?.Balance:C0}")</span>
+        </li>
+        <li class="list-group-item">
+          <span class="text-secondary">Total Income</span><br>
+          <span class="fw-bold">@($"{Model.Transactions?.Income:C0}")</span>
+        </li>
+        <li class="list-group-item">
+          <span class="text-secondary">Total Expense</span><br>
+          <span class="fw-bold">@($"{Model.Transactions?.Expense:C0}")</span>
+        </li>
+      </ul>
+    </div>
+    <div class="col-md-6">
+      <div class="d-flex flex-column gap-3">
+        <a asp-action="TopUp" class="btn btn-outline-success w-100 fw-bold py-2">Top Up</a>
+        <a asp-action="Transfer" class="btn btn-outline-success w-100 fw-bold py-2">Transfer</a>
+        <a asp-action="TransactionHistory" class="btn btn-outline-success w-100 fw-bold py-2">Transaction History</a>
+      </div>
+    </div>
+  </div>
+</div>
