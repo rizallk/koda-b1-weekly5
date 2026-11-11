@@ -9,25 +9,21 @@ Implementasi RESTful API sistem E-Wallet berbasis .NET dengan arsitektur MVC (Mo
 ```text
 Weekly5/
 ├── Controllers/
-│   ├── UsersController.cs
-│   ├── WalletsController.cs
-│   └── TransactionsController.cs
+│   ├── UserController.cs
+│   ├── WalletController.cs
+│   ├── TransferController.cs
+|   ...
 ├── DTOs/
-│   ├── UserDto.cs
-│   ├── WalletDto.cs
-│   └── TransactionDto.cs
+│   ├── UserRequest.cs
+│   ├── WalletRequest.cs
+│   ├── TransactionResponse.cs
+|   ...
 ├── Models/
 │   ├── Users.cs
 │   ├── Wallets.cs
 │   └── Transactions.cs
 ├── Repositories/
-│   ├── Interfaces/
-│   └── Implementations/
 ├── Services/
-│   ├── Interfaces/
-│   └── Implementations/
-├── Data/
-│   └── AppDbContext.cs
 ├── Properties/
 │   └── launchSettings.json
 ├── appsettings.json
@@ -143,33 +139,6 @@ classDiagram
   User "1" -- "0..*" Wallet : owns
   Wallet "1" -- "0..*" Transaction : sends/receives
 ```
-
----
-
-## Daftar Endpoint API
-
-### 1. Users Endpoint
-| Method | Endpoint | Deskripsi | Request Body | Response |
-|---|---|---|---|---|
-| `POST` | `/api/users` | Membuat user baru | `{ "name": "string", "email": "string", "phone": "string" }` | `201 Created` |
-| `GET` | `/api/users` | Mengambil seluruh daftar user | - | `200 OK` |
-| `GET` | `/api/users/{id}` | Mengambil detail user berdasarkan ID | - | `200 OK` / `404 Not Found` |
-
-### 2. Wallets Endpoint
-| Method | Endpoint | Deskripsi | Request Body | Response |
-|---|---|---|---|---|
-| `POST` | `/api/wallets` | Membuat wallet baru untuk user | `{ "userId": int, "walletNumber": "string", "balance": decimal }` | `201 Created` |
-| `GET` | `/api/wallets/{id}` | Mengambil detail wallet berdasarkan ID | - | `200 OK` / `404 Not Found` |
-| `GET` | `/api/users/{userId}/wallets` | Mengambil daftar wallet milik user tertentu | - | `200 OK` |
-
-### 3. Transactions Endpoint
-| Method | Endpoint | Deskripsi | Request Body | Response |
-|---|---|---|---|---|
-| `POST` | `/api/transactions/topup` | Melakukan isi ulang saldo (Top Up) | `{ "receiverWalletId": int, "amount": decimal, "description": "string" }` | `200 OK` / `400 Bad Request` |
-| `POST` | `/api/transactions/transfer` | Melakukan transfer antar wallet | `{ "senderWalletId": int, "receiverWalletId": int, "amount": decimal, "description": "string" }` | `200 OK` / `400 Bad Request` |
-| `GET` | `/api/transactions` | Mengambil riwayat seluruh transaksi | - | `200 OK` |
-| `GET` | `/api/wallets/{walletId}/transactions` | Mengambil riwayat transaksi berdasarkan wallet | - | `200 OK` |
-
 ---
 
 ## Cara Menjalankan Project
@@ -179,22 +148,6 @@ classDiagram
 - Database (SQL Server / PostgreSQL / SQLite sesuai konfigurasi `appsettings.json`)
 
 ### Langkah-langkah Running
-1. Clone repositori ke komputer lokal Anda:
-   ```bash
-   git clone https://github.com/username/weekly5-dotnet.git
-   cd weekly5-dotnet
-   ```
-
-2. Restorasi package/dependencies project:
-   ```bash
-   dotnet restore
-   ```
-
-3. Jalankan migrasi database (jika menggunakan EF Core):
-   ```bash
-   dotnet ef database update
-   ```
-
 4. Jalankan aplikasi:
    ```bash
    dotnet run
@@ -222,4 +175,4 @@ classDiagram
 </p>
 <p align="center">
   <img src="image5.png" alt="Testing History Transaksi" width="600"/>
-</p>
+</p>s
