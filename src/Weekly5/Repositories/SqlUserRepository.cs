@@ -72,7 +72,8 @@ public sealed class SqlUserRepository : IUserRepository
         t.Description
       FROM dbo.Transactions t
       INNER JOIN dbo.Wallets w 
-        ON w.Id IN (t.SenderWalletId, t.ReceiverWalletId)
+        ON (w.Id = t.SenderWalletId AND LOWER(t.Type) = 'expense')
+        OR (w.Id = t.ReceiverWalletId AND LOWER(t.Type) = 'income')
       WHERE w.UserId = @id
       ORDER BY t.CreatedAt DESC;
     """;

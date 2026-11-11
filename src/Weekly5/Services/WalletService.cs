@@ -26,6 +26,17 @@ public sealed class WalletService : IWalletService
     return wallet is null ? null : WalletResponse.FromModel(wallet);
   }
 
+  public async Task<Wallet?> GetByIdAsync(int id, CancellationToken cancellationToken)
+  {
+    return await _walletRepository.GetByIdAsync(id, cancellationToken);
+  }
+
+  public async Task<Wallet?> GetByWalletNumberAsync(string walletNumber, CancellationToken cancellationToken)
+  {
+    return await _walletRepository.GetByWalletNumberAsync(walletNumber, cancellationToken);
+  }
+
+
   public async Task<WalletResponse?> CreateAsync(WalletRequest request, CancellationToken cancellationToken)
   {
     var wallet = new Wallet(request.UserId, request.WalletNumber, request.Balance);

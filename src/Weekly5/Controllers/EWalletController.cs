@@ -11,12 +11,14 @@ public sealed class EWalletController : Controller
   private readonly IUserService _userService;
   private readonly ITransactionService _transactionService;
   private readonly IWalletService _walletService;
+  private readonly ITransferService _transferService;
 
-  public EWalletController(IUserService userService, ITransactionService transactionService, IWalletService walletService)
+  public EWalletController(IUserService userService, ITransactionService transactionService, IWalletService walletService, ITransferService transferService)
   {
     _userService = userService;
     _transactionService = transactionService;
     _walletService = walletService;
+    _transferService = transferService;
   }
 
   // Home page
@@ -74,29 +76,11 @@ public sealed class EWalletController : Controller
     return View("~/Views/Dashboard.cshtml", viewModel);
   }
 
-  // Detail User
-  [HttpGet("details/{id}")]
-  public async Task<IActionResult> Details(
-      int id,
-      CancellationToken cancellationToken)
-  {
-    var user = await _userService.GetByIdAsync(
-        id,
-        cancellationToken);
-
-    if (user is null)
-    {
-      return NotFound();
-    }
-
-    return View(user);
-  }
-
   // Create New User (view)
   [HttpGet("create")]
   public IActionResult Create()
   {
-    return View(new UserViewModel());
+    return View("~/Views/Users/Create.cshtml", new UserViewModel());
   }
 
   // Create New User (action)
@@ -108,7 +92,7 @@ public sealed class EWalletController : Controller
   {
     if (!ModelState.IsValid)
     {
-      return View(model);
+      return View("~/Views/Users/Create.cshtml", model);
     }
 
     try
@@ -136,7 +120,7 @@ public sealed class EWalletController : Controller
           "User berhasil ditambahkan.";
 
       return RedirectToAction(
-          nameof(Details),
+          nameof(Index),
           new { id = created.Id });
     }
     catch (ArgumentException ex)
@@ -145,7 +129,7 @@ public sealed class EWalletController : Controller
           string.Empty,
           ex.Message);
 
-      return View(model);
+      return View("~/Views/Users/Create.cshtml", model);
     }
   }
 
@@ -173,7 +157,7 @@ public sealed class EWalletController : Controller
       Phone = user.Phone
     };
 
-    return View(model);
+    return View("~/Views/Users/Edit.cshtml", model);
   }
 
   // Edit User (action)
@@ -188,7 +172,7 @@ public sealed class EWalletController : Controller
 
     if (!ModelState.IsValid)
     {
-      return View(model);
+      return View("~/Views/Users/Edit.cshtml", model);
     }
 
     try
@@ -214,7 +198,7 @@ public sealed class EWalletController : Controller
           "User berhasil diperbarui.";
 
       return RedirectToAction(
-          nameof(Details),
+          nameof(Dashboard),
           new { id = updated.Id });
     }
     catch (ArgumentException ex)
@@ -223,7 +207,7 @@ public sealed class EWalletController : Controller
           string.Empty,
           ex.Message);
 
-      return View(model);
+      return View("~/Views/Users/Edit.cshtml", model);
     }
   }
 
@@ -327,10 +311,98 @@ public sealed class EWalletController : Controller
   }
 
   // Transfer (view)
+  [HttpGet("transfer")]
+  public IActionResult Transfer()
+  {
+    var activeUserId = HttpContext.Session.GetInt32("ActiveUserId");
+
+    if (activeUserId is null)
+    {
+      TempData["AccessDenied"] = "Akses ditolak. Pilih akun terlebih dahulu.";
+      return RedirectToAction(nameof(Index));
+    }
+
+    var model = new TransferViewModel { SenderUserId = activeUserId.Value };
+    return View("~/Views/Wallets/Transfer.cshtml", model);
+  }
 
   // Transfer (action)
+  [HttpPost("transfer")]
+  [ValidateAntiForgeryToken]
+  public async Task<IActionResult> Transfer(
+      TransferViewModel model,
+      CancellationToken cancellationToken)
+  {
+    var activeUserId = HttpContext.Session.GetInt32("ActiveUserId");
+
+    if (activeUserId is null)
+    {
+      TempData["AccessDenied"] = "Akses ditolak. Pilih akun terlebih dahulu.";
+      return RedirectToAction(nameof(Index));
+    }
+
+    if (!ModelState.IsValid)
+    {
+      return View("~/Views/Wallets/Transfer.cshtml", model);
+    }
+
+    try
+    {
+      var senderWallet = await _walletService.GetByUserIdAsync(activeUserId.Value, cancellationToken);
+      if (senderWallet is null)
+      {
+        ModelState.AddModelError(string.Empty, "Dompet pengirim tidak ditemukan.");
+        return View("~/Views/Wallets/Transfer.cshtml", model);
+      }
+
+      var receiverWallet = await _walletService.GetByWalletNumberAsync(model.ReceiverWalletNumber, cancellationToken);
+      if (receiverWallet is null)
+      {
+        ModelState.AddModelError(nameof(model.ReceiverWalletNumber), "Nomor wallet tujuan tidak ditemukan.");
+        return View("~/Views/Wallets/Transfer.cshtml", model);
+      }
+
+      if (senderWallet.Id == receiverWallet.Id)
+      {
+        ModelState.AddModelError(nameof(model.ReceiverWalletNumber), "Tidak dapat melakukan transfer ke dompet sendiri.");
+        return View("~/Views/Wallets/Transfer.cshtml", model);
+      }
+
+      var request = new TransferRequest(
+          senderWallet.Id,
+          receiverWallet.Id,
+          model.Amount,
+          model.Description ?? "Transfer"
+      );
+
+      await _transferService.TransferAsync(request, cancellationToken);
+
+      TempData["Success"] = "Transfer berhasil dikirim.";
+      return RedirectToAction(nameof(Dashboard));
+    }
+    catch (Exception ex)
+    {
+      ModelState.AddModelError(string.Empty, ex.Message);
+      return View("~/Views/Wallets/Transfer.cshtml", model);
+    }
+  }
 
   // Transaction History
+  [HttpGet("history")]
+  public async Task<IActionResult> History(CancellationToken cancellationToken)
+  {
+    var activeUserId = HttpContext.Session.GetInt32("ActiveUserId");
+
+    if (activeUserId is null)
+    {
+      TempData["AccessDenied"] = "Akses ditolak. Pilih akun terlebih dahulu.";
+      return RedirectToAction(nameof(Index));
+    }
+
+    var transactions = await _userService.GetUserTransactionByUserIdAsync(activeUserId.Value, cancellationToken);
+
+    return View("~/Views/TransactionHistory.cshtml", transactions);
+  }
 
   // Exit
   [HttpGet("exit")]

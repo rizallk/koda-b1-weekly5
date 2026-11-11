@@ -46,7 +46,9 @@ public sealed class SqlTransactionRepository : ITransactionRepository
         SUM(Amount) AS TotalAmount
       FROM Transactions
       WHERE 
-        SenderWalletId = @WalletId OR ReceiverWalletId = @WalletId
+        (SenderWalletId = @WalletId AND LOWER(Type) = 'expense') 
+        OR 
+        (ReceiverWalletId = @WalletId AND LOWER(Type) = 'income')
       GROUP BY Type;
     """;
 

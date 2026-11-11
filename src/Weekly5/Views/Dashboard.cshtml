@@ -23,15 +23,15 @@
         </li>
         <li class="list-group-item">
           <span class="text-secondary">Saldo</span><br>
-          <span class="fw-bold">@($"{Model.UserWallet?.Balance:C0}")</span>
+          <span class="fw-bold">@($"{(Model.UserWallet?.Balance ?? 0):C0}")</span>
         </li>
         <li class="list-group-item">
           <span class="text-secondary">Total Income</span><br>
-          <span class="fw-bold">@($"{Model.Transactions?.Income:C0}")</span>
+          <span class="fw-bold">@($"{(Model.Transactions?.Income ?? 0):C0}")</span>
         </li>
         <li class="list-group-item">
           <span class="text-secondary">Total Expense</span><br>
-          <span class="fw-bold">@($"{Model.Transactions?.Expense:C0}")</span>
+          <span class="fw-bold">@($"{(Model.Transactions?.Expense ?? 0):C0}")</span>
         </li>
       </ul>
     </div>
@@ -39,9 +39,10 @@
       <div class="d-flex flex-column gap-3">
         <a asp-action="TopUp" class="btn btn-outline-success w-100 fw-bold py-2">Top Up</a>
         <a asp-action="Transfer" class="btn btn-outline-success w-100 fw-bold py-2">Transfer</a>
-        <a asp-action="TransactionHistory" class="btn btn-outline-success w-100 fw-bold py-2">Transaction History</a>
+        <a asp-action="History" class="btn btn-outline-success w-100 fw-bold py-2">Transaction History</a>
         <hr class="my-2">
-        <a asp-action="TransactionHistory" class="btn btn-outline-warning w-100 fw-bold py-2">Edit Profile</a>
+        <a asp-action="Edit" asp-route-id="@Model.UserWallet?.UserId"
+           class="btn btn-outline-warning w-100 fw-bold py-2">Edit Profile</a>
       </div>
     </div>
   </div>

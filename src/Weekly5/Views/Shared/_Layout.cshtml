@@ -24,12 +24,12 @@
   <main class="container my-4">
     <div class="d-flex justify-content-between align-items-center">
       <h2><i class="bi-wallet2"></i>&nbsp; <b><span class="text-success">E</span>-Wallet</b></h2>
-      @if (ViewData["Title"] is not "Home Page") 
+      @if (ViewData["Title"] is not "Home Page" && ViewData["Title"] is not "Create" ) 
       {
         <a asp-action="Exit" class="btn btn-danger btn-sm">Exit</a>
         } else
         {
-          <a href="" class="btn btn-primary btn-sm">Create New User</a>
+          <a asp-action="Create" class="btn btn-primary btn-sm">Create New User</a>
         }
       </div>
     <hr>

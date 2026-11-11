@@ -8,4 +8,6 @@ public interface IWalletRepository
   Task<bool> TryAddAsync(Wallet wallet, CancellationToken cancellationToken);
   Task<bool> TryUpdateBalanceAsync(Wallet wallet, CancellationToken cancellationToken);
   Task<string?> GetLastWalletNumberAsync(CancellationToken cancellationToken);
+  Task<Wallet?> GetByIdAsync(int id, CancellationToken cancellationToken);
+  Task<Wallet?> GetByWalletNumberAsync(string walletNumber, CancellationToken cancellationToken);
 }

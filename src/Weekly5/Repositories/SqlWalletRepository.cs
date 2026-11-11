@@ -35,6 +35,48 @@ public sealed class SqlWalletRepository : IWalletRepository
     return ReadWallet(reader);
   }
 
+  public async Task<Wallet?> GetByIdAsync(int id, CancellationToken cancellationToken)
+  {
+    const string sql = """
+      SELECT Id, UserId, WalletNumber, Balance FROM dbo.Wallets WHERE Id = @id;
+    """;
+
+    await EnsureConnectionOpenAsync(cancellationToken);
+
+    await using var command = new SqlCommand(sql, _connection);
+    command.Parameters.Add("@id", SqlDbType.Int).Value = id;
+
+    await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+
+    if (!await reader.ReadAsync(cancellationToken))
+    {
+      return null;
+    }
+
+    return ReadWallet(reader);
+  }
+
+  public async Task<Wallet?> GetByWalletNumberAsync(string walletNumber, CancellationToken cancellationToken)
+  {
+    const string sql = """
+      SELECT Id, UserId, WalletNumber, Balance FROM dbo.Wallets WHERE WalletNumber = @walletNumber;
+    """;
+
+    await EnsureConnectionOpenAsync(cancellationToken);
+
+    await using var command = new SqlCommand(sql, _connection);
+    command.Parameters.Add("@walletNumber", SqlDbType.NVarChar, 20).Value = walletNumber;
+
+    await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+
+    if (!await reader.ReadAsync(cancellationToken))
+    {
+      return null;
+    }
+
+    return ReadWallet(reader);
+  }
+
   public async Task<bool> TryAddAsync(Wallet wallet, CancellationToken cancellationToken)
   {
     const string sql = """
