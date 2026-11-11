@@ -52,7 +52,7 @@ public sealed class WalletService : IWalletService
 
     if (updated)
     {
-      var newTrx = new Models.Transaction(null, userId, "topup", request.Balance, "Top up via Virtual Account Bank BCA");
+      var newTrx = new Models.Transaction(null, userId, "income", request.Balance, "Top up via Virtual Account Bank BCA");
 
       await _transactionRepository.TryAddAsync(newTrx, cancellationToken);
 

@@ -1,4 +1,4 @@
-@model TopUpViewModel
+@model DashboardViewModel
 
 @{
   ViewData["Title"] = "Top Up";
@@ -6,6 +6,9 @@
 
 <form asp-action="TopUp" method="post">
   <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+  <input asp-for="TopUp.UserId" type="hidden" />
+  <input asp-for="TopUp.WalletNumber" type="hidden" />
 
   <!-- Product Name -->
   @* <div class="mb-3">
@@ -16,13 +19,13 @@
   </div> *@
 
   <div class="mb-3">
-    <label asp-for="Balance" class="form-label fw-bold"></label>
+    <label asp-for="TopUp.Balance" class="form-label fw-bold"></label>
     <div class="input-group has-validation">
       <span class="input-group-text">Rp</span>
-      <input asp-for="Balance" type="number" min="0" step="0.01"
-             class="form-control @(ViewData.ModelState["Balance"]?.Errors.Count > 0 ? "is-invalid" : "")"
+      <input asp-for="TopUp.Balance" type="number" min="0" step="0.01"
+             class="form-control @(ViewData.ModelState.GetFieldValidationState("TopUp.Balance") == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid ? "is-invalid" : "")"
              placeholder="Masukkan nominal" />
-      <span asp-validation-for="Balance" class="invalid-feedback"></span>
+      <span asp-validation-for="TopUp.Balance" class="invalid-feedback"></span>
     </div>
   </div>
 

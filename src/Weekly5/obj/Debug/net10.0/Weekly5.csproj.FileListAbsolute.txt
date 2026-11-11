@@ -71,3 +71,4 @@ D:\Koda\weekly\koda-b1-weekly5\src\Weekly5\obj\Debug\net10.0\Weekly5.RazorAssemb
 D:\Koda\weekly\koda-b1-weekly5\src\Weekly5\bin\Debug\net10.0\Weekly5.staticwebassets.runtime.json
 D:\Koda\weekly\koda-b1-weekly5\src\Weekly5\obj\Debug\net10.0\compressed\f5d0nuymw4-{0}-zyk8q6yb6d-zyk8q6yb6d.gz
 D:\Koda\weekly\koda-b1-weekly5\src\Weekly5\obj\Debug\net10.0\compressed\tycs489lvy-{0}-zand7dinh4-zand7dinh4.gz
+D:\Koda\weekly\koda-b1-weekly5\src\Weekly5\obj\Debug\net10.0\Weekly5.sourcelink.json

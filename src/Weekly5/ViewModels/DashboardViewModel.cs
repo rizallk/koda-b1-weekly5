@@ -6,4 +6,5 @@ public class DashboardViewModel
 {
   public UserWallet? UserWallet { get; set; }
   public TotalTransaction? Transactions { get; set; }
+  public TopUpViewModel? TopUp { get; set; } = new();
 }

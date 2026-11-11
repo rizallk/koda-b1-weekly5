@@ -10,11 +10,13 @@ public sealed class EWalletController : Controller
 {
   private readonly IUserService _userService;
   private readonly ITransactionService _transactionService;
+  private readonly IWalletService _walletService;
 
-  public EWalletController(IUserService userService, ITransactionService transactionService)
+  public EWalletController(IUserService userService, ITransactionService transactionService, IWalletService walletService)
   {
     _userService = userService;
     _transactionService = transactionService;
+    _walletService = walletService;
   }
 
   // Home page
@@ -227,40 +229,74 @@ public sealed class EWalletController : Controller
 
   // Top Up (view)
   [HttpGet("topup")]
-  public async Task<IActionResult> TopUp(
+  public async Task<IActionResult> TopUp(CancellationToken cancellationToken
   )
   {
-    return View("~/Views/Wallets/TopUp.cshtml");
+    var activeUserId = HttpContext.Session.GetInt32("ActiveUserId");
+
+    if (activeUserId is null)
+    {
+      TempData["AccessDenied"] =
+          "Akses ditolak. Pilih akun terlebih dahulu.";
+      return RedirectToAction(nameof(Index));
+    }
+
+    var user = await _userService.GetByIdAsync(activeUserId ?? 0,
+        cancellationToken);
+
+    if (user is null)
+    {
+      TempData["AccessDenied"] =
+          "User tidak ditemukan.";
+      return RedirectToAction(nameof(Index));
+    }
+
+    var viewModel = new DashboardViewModel
+    {
+      UserWallet = user,
+      TopUp = new TopUpViewModel
+      {
+        UserId = user.UserId,
+        WalletNumber = user.WalletNumber
+      }
+    };
+
+    return View("~/Views/Wallets/TopUp.cshtml", viewModel);
   }
 
   // Top Up (action)
   [HttpPost("topup")]
   [ValidateAntiForgeryToken]
   public async Task<IActionResult> TopUp(
-      int id,
-      UserViewModel model,
+      [Bind(Prefix = "TopUp")] TopUpViewModel model,
       CancellationToken cancellationToken)
   {
-    ViewData["Id"] = id;
+    var activeUserId = HttpContext.Session.GetInt32("ActiveUserId") ?? model.UserId;
 
     if (!ModelState.IsValid)
     {
-      return View(model);
+      var user = await _userService.GetByIdAsync(activeUserId, cancellationToken);
+
+      var viewModel = new DashboardViewModel
+      {
+        UserWallet = user,
+        TopUp = model
+      };
+
+      return View("~/Views/Wallets/TopUp.cshtml", viewModel);
     }
 
     try
     {
-      var request = new UserRequest
+      var request = new WalletRequest
       (
-        model.Name,
-        model.Email,
-        model.Phone
+        model.UserId,
+        model.WalletNumber ?? "",
+        model.Balance ?? 0
       );
 
-      var updated = await _userService.UpdateAsync(
-          id,
-          request,
-          cancellationToken);
+
+      var updated = await _walletService.UpdateBalanceAsync(request.UserId, request, cancellationToken);
 
       if (updated is null)
       {
@@ -268,11 +304,9 @@ public sealed class EWalletController : Controller
       }
 
       TempData["Success"] =
-          "User berhasil diperbarui.";
+          "Top Up berhasil.";
 
-      return RedirectToAction(
-          nameof(Details),
-          new { id = updated.Id });
+      return RedirectToAction(nameof(Dashboard));
     }
     catch (ArgumentException ex)
     {
@@ -280,7 +314,15 @@ public sealed class EWalletController : Controller
           string.Empty,
           ex.Message);
 
-      return View(model);
+      var user = await _userService.GetByIdAsync(activeUserId, cancellationToken);
+
+      var viewModel = new DashboardViewModel
+      {
+        UserWallet = user,
+        TopUp = model
+      };
+
+      return View(viewModel);
     }
   }
 
