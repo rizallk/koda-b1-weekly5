@@ -4,25 +4,33 @@
   ViewData["Title"] = "Top Up";
 }
 
-<form asp-action="TopUp" method="post">
-  <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+<div>
+  <h4 class="mb-4">Top Up</h4>
+  
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <form asp-action="TopUp" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-  <input asp-for="TopUp.UserId" type="hidden" />
-  <input asp-for="TopUp.WalletNumber" type="hidden" />
+        <input asp-for="TopUp.UserId" type="hidden" />
+        <input asp-for="TopUp.WalletNumber" type="hidden" />
 
-  <div class="mb-3">
-    <label asp-for="TopUp.Balance" class="form-label fw-bold"></label>
-    <div class="input-group has-validation">
-      <span class="input-group-text">Rp</span>
-      <input asp-for="TopUp.Balance" type="number" min="0" step="0.01"
-             class="form-control @(ViewData.ModelState.GetFieldValidationState("TopUp.Balance") == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid ? "is-invalid" : "")"
-             placeholder="Masukkan nominal" />
-      <span asp-validation-for="TopUp.Balance" class="invalid-feedback"></span>
+        <div class="mb-3">
+          <label asp-for="TopUp.Balance" class="form-label fw-bold"></label>
+          <div class="input-group has-validation">
+            <span class="input-group-text">Rp</span>
+            <input asp-for="TopUp.Balance" type="number" min="0" step="0.01"
+                   class="form-control @(ViewData.ModelState.GetFieldValidationState("TopUp.Balance") == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid ? "is-invalid" : "")"
+                   placeholder="Masukkan nominal" />
+            <span asp-validation-for="TopUp.Balance" class="invalid-feedback"></span>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-between gap-2 mt-4">
+          <a asp-action="Dashboard" class="btn btn-outline-secondary">Kembali</a>
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+      </form>
     </div>
   </div>
-
-  <div class="d-flex justify-content-end gap-2 mt-4">
-    <a asp-action="Dashboard" class="btn btn-outline-secondary">Kembali</a>
-    <button type="submit" class="btn btn-primary">Submit</button>
-  </div>
-</form>
+</div>
